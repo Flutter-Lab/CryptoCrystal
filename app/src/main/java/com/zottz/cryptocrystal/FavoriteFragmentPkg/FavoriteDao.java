@@ -32,4 +32,7 @@ public interface FavoriteDao {
 
     @Query("UPDATE Favorite SET currency_rsi = :rsiValue WHERE currency_symbol = :symbol")
     void updateRSIValue(double rsiValue, String symbol);
+
+    @Query("SELECT currency_rsi FROM Favorite WHERE currency_symbol= :symbol")
+    float getRSIvalueFromDB(String symbol);
 }

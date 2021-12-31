@@ -40,9 +40,12 @@
         <entry key="..\:/Android Temp Project/CryptoCrystal/app/src/main/res/layout/fragment_home.xml" value="0.33425925925925926" />
         <entry key="..\:/Android Temp Project/CryptoCrystal/app/src/main/res/layout/sample_layout.xml" value="0.34479166666666666" />
         <entry key="..\:/Android Temp Project/CryptoCrystal/app/src/main/res/layout/toolbar.xml" value="0.34479166666666666" />
+        <entry key="..\:/Users/Abir/Documents/GitHub/CryptoCrystal/app/src/main/res/layout/fragment_favorites.xml" value="0.3489583333333333" />
+        <entry key="..\:/Users/Abir/Documents/GitHub/CryptoCrystal/app/src/main/res/layout/fragment_home.xml" value="0.21784420289855072" />
       </map>
     </option>
   </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>

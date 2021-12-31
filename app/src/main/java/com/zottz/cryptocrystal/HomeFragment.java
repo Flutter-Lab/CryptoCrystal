@@ -75,10 +75,6 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-//    private void showToast(String message) {
-//        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-//    }
-
     private void getRVData() {
         currenciesRV.setHasFixedSize(true);
         //loadingPB = findViewById(R.id.idPBLoading);
@@ -168,48 +164,8 @@ public class HomeFragment extends Fragment {
                     JSONObject pc7dObj = dataObj.getJSONObject("7d");
                     double pc7d = pc7dObj.getDouble("price_change_pct") * 100;
 
-
-
-
-
-
-
-                    //Getting RSI Value
-                    //double rsiValue = 0.0;
-                    getRsiData(symbol);
-                    //Log.i(TAG, "getRsiData in Nomics: " + symbol + ":  " + rsiValue);
-
                     currencyRVModalArrayList.add(new CurrencyRVModel(symbol, name, urlString, price, pc1h, pc24h, pc7d, marketCap, volume));
                     symbolArrayList.add(symbol);
-
-
-                    ArrayList<String> favCurrencyList = new ArrayList<>();
-                    Favorite favorite = new Favorite();
-                    List<Favorite> favoriteList = db.favoriteDao().getAllFavorites();
-
-
-                    //Make a list of DB Symbols
-                    for (int k = 0; k < favoriteList.size(); k++) {
-                        favCurrencyList.add(favoriteList.get(k).currencySymbol);
-                    }
-                    //If symbol is in DB then update Symbol currency info to DB
-                    if (favCurrencyList.contains(symbol)) {
-                        favorite.favoriteID = favCurrencyList.indexOf(symbol) + 1;
-                        favorite.currencyName = name;
-                        favorite.currencySymbol = symbol;
-                        favorite.currencyPrice = (float) price;
-                        favorite.currencyIconURL = urlString;
-                        favorite.pc1H = (float) pc1h;
-                        favorite.pc24H = (float)  pc24h;
-                        favorite.pc7D = (float) pc7d;
-                        favorite.currencyCap = (float) marketCap;
-                        favorite.currencyVol = (float) volume;
-
-
-
-                        db.favoriteDao().updateFavorite(favorite);
-                    }
-
                 }
 
 
@@ -225,71 +181,6 @@ public class HomeFragment extends Fragment {
         });
 
         requestQueue.add(jsonArrayRequest);
-    }
-
-
-
-
-
-
-
-
-
-
-
-    private void getRsiData(String symbol) {
-
-        ArrayList<String> favCurrencyListnew = new ArrayList<>();
-        //Save coin Name to Favorite DB Table
-        Favorite favorite = new Favorite();
-        List<Favorite> favoriteList = db.favoriteDao().getAllFavorites();
-
-        for (int i = 0; i < favoriteList.size(); i++) {
-            favCurrencyListnew.add(favoriteList.get(i).currencySymbol);
-        }
-        if (favCurrencyListnew.contains(symbol)) {
-            try {
-                String rsiUrl = "https://api.taapi.io/rsi?secret=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImF6dWJhaXIxMjNAZ21haWwuY29tIiwiaWF0IjoxNjM5MTY5MDg4LCJleHAiOjc5NDYzNjkwODh9.DUufwGln3wS7y_qAyaVIu_CvXVRxLczpJUT96Z6lpEc&exchange=binance&symbol=" + symbol + "/USDT&interval=1h";
-                RequestQueue rsiRequestQueue = Volley.newRequestQueue(getContext());
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, rsiUrl, null, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-
-                        Log.i(TAG, "Total Response is: " + response);
-
-
-                        try {
-                            double rsi = response.getDouble("value");
-                            //Update RSI value to database
-                            db.favoriteDao().updateRSIValue(rsi, symbol);
-                                    Log.i(TAG, "getRsiData in try: " + symbol+ rsiValue);
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            double rsi = 1.23;
-                            //finalRSI = rsi;
-                            Log.i(TAG, "RSi Not Found: " + rsi);
-                        }
-
-
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //Toast.makeText(getContext(), "Fail to get RSI data..", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                {
-
-                    rsiRequestQueue.add(jsonObjectRequest);
-                }
-            } catch (Exception e) {
-
-            }
-
-        }
-
     }
 
 }
