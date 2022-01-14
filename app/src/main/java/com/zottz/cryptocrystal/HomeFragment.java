@@ -22,6 +22,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.zottz.cryptocrystal.AllCoinDB.AllCoin;
 import com.zottz.cryptocrystal.FavoriteFragmentPkg.Favorite;
 import com.zottz.cryptocrystal.SetAlertActivity.AlertDB.MainDatabase;
 
@@ -53,6 +54,13 @@ public class HomeFragment extends Fragment {
     MainDatabase db;
     List<Favorite> favoriteItemList;
 
+    List<AllCoin> allCoinList;
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Nullable
     @Override
@@ -69,15 +77,13 @@ public class HomeFragment extends Fragment {
         loadingPB = view.findViewById(R.id.idPBLoading);
 
         getRVData();
+        getAllCoinListFromDB();
         getCurrencyDataNomics();
 
 
         return view;
     }
 
-//    private void showToast(String message) {
-//        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-//    }
 
     private void getRVData() {
         currenciesRV.setHasFixedSize(true);
@@ -92,50 +98,47 @@ public class HomeFragment extends Fragment {
 
         //FavRVModel Array List
         favRVModelArraylist = new ArrayList<>();
-
-
         //Set OnClick RV Item
-        currencyRVAdapter.setOnItemClickListener(position -> {
-            String adapterCurrencySymbol = currencyRVModalArrayList.get(position).getSymbol();
-            String adapterCurrencyName = currencyRVModalArrayList.get(position).getName();
-            String adapterCurrencyURL = currencyRVModalArrayList.get(position).getLogoURL();
-            double adapterCurrencyPrice = currencyRVModalArrayList.get(position).getPrice();
-
-            double adapterCurrencyPC1H = currencyRVModalArrayList.get(position).getPc1h();
-            double adapterCurrencyPC24H = currencyRVModalArrayList.get(position).getPc24h();
-            double adapterCurrencyPC7D = currencyRVModalArrayList.get(position).getPc7d();
-            double adapterCurrencyCap = currencyRVModalArrayList.get(position).getCap();
-            double adapterCurrencyVol = currencyRVModalArrayList.get(position).getVol();
-            double adapterCurrencyRSI = currencyRVModalArrayList.get(position).getRsi();
-
-
-            favCurrencyList = new ArrayList<>();
-
-            //Save coin Name to Favorite DB Table
-            Favorite favorite = new Favorite();
-            List<Favorite> favoriteList = db.favoriteDao().getAllFavorites();
-
-            for (int i = 0; i < favoriteList.size(); i++) {
-                favCurrencyList.add(favoriteList.get(i).currencySymbol);
-            }
-            if (!favCurrencyList.contains(adapterCurrencySymbol)) {
-                favorite.currencyName = adapterCurrencyName;
-                favorite.currencySymbol = adapterCurrencySymbol;
-                favorite.currencyIconURL = adapterCurrencyURL;
-                favorite.currencyPrice = (float) adapterCurrencyPrice;
-                favorite.pc1H = (float) adapterCurrencyPC1H;
-                favorite.pc24H = (float) adapterCurrencyPC24H;
-                favorite.pc7D = (float) adapterCurrencyPC7D;
-                favorite.currencyCap = (float) adapterCurrencyCap;
-                favorite.currencyVol = (float) adapterCurrencyVol;
-                favorite.currencyRSI = (float) adapterCurrencyRSI;
-
-                db.favoriteDao().insertFavorite(favorite);
-                Toast.makeText(getContext(), adapterCurrencySymbol + " is added to Favorite List", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), adapterCurrencySymbol + " is already in Favorite List", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        currencyRVAdapter.setOnItemClickListener(position -> {
+//            String adapterCurrencySymbol = currencyRVModalArrayList.get(position).getSymbol();
+//            String adapterCurrencyName = currencyRVModalArrayList.get(position).getName();
+//            String adapterCurrencyURL = currencyRVModalArrayList.get(position).getLogoURL();
+//            double adapterCurrencyPrice = currencyRVModalArrayList.get(position).getPrice();
+//            double adapterCurrencyPC1H = currencyRVModalArrayList.get(position).getPc1h();
+//            double adapterCurrencyPC24H = currencyRVModalArrayList.get(position).getPc24h();
+//            double adapterCurrencyPC7D = currencyRVModalArrayList.get(position).getPc7d();
+//            double adapterCurrencyCap = currencyRVModalArrayList.get(position).getCap();
+//            double adapterCurrencyVol = currencyRVModalArrayList.get(position).getVol();
+//            double adapterCurrencyRSI = currencyRVModalArrayList.get(position).getRsi();
+//
+//
+//            favCurrencyList = new ArrayList<>();
+//
+//            //Save coin Name to Favorite DB Table
+//            Favorite favorite = new Favorite();
+//            List<Favorite> favoriteList = db.favoriteDao().getAllFavorites();
+//
+//            for (int i = 0; i < favoriteList.size(); i++) {
+//                favCurrencyList.add(favoriteList.get(i).currencySymbol);
+//            }
+//            if (!favCurrencyList.contains(adapterCurrencySymbol)) {
+//                favorite.currencyName = adapterCurrencyName;
+//                favorite.currencySymbol = adapterCurrencySymbol;
+//                favorite.currencyIconURL = adapterCurrencyURL;
+//                favorite.currencyPrice = (float) adapterCurrencyPrice;
+//                favorite.pc1H = (float) adapterCurrencyPC1H;
+//                favorite.pc24H = (float) adapterCurrencyPC24H;
+//                favorite.pc7D = (float) adapterCurrencyPC7D;
+//                favorite.currencyCap = (float) adapterCurrencyCap;
+//                favorite.currencyVol = (float) adapterCurrencyVol;
+//                favorite.currencyRSI = (float) adapterCurrencyRSI;
+//
+//                db.favoriteDao().insertFavorite(favorite);
+//                Toast.makeText(getContext(), adapterCurrencySymbol + " is added to Favorite List", Toast.LENGTH_SHORT).show();
+//            } else {
+//                Toast.makeText(getContext(), adapterCurrencySymbol + " is already in Favorite List", Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 
 
@@ -170,17 +173,45 @@ public class HomeFragment extends Fragment {
 
 
 
-
-
-
-
                     //Getting RSI Value
-                    //double rsiValue = 0.0;
-                    getRsiData(symbol);
+                    //getRsiData(symbol);
                     //Log.i(TAG, "getRsiData in Nomics: " + symbol + ":  " + rsiValue);
 
                     currencyRVModalArrayList.add(new CurrencyRVModel(symbol, name, urlString, price, pc1h, pc24h, pc7d, marketCap, volume));
                     symbolArrayList.add(symbol);
+
+
+
+                    //Insert / Upate data to All Coin List Table (Database)
+                    ArrayList<String> allCoinList = new ArrayList<>();
+                    AllCoin allCoin = new AllCoin();
+                    List<AllCoin> allCoinListDB = db.allCoinDao().getAllCoinList();
+                    for(int l = 0; l < allCoinListDB.size(); l++){
+                        allCoinList.add(allCoinListDB.get(l).currencySymbol);
+                    }
+
+                    if (allCoinList.contains(symbol)){
+                        db.allCoinDao().updateCoinRow(price, pc1h, pc24h, pc7d, marketCap, volume, symbol);
+                    } else{
+                        allCoin.currencyName = name;
+                        allCoin.currencySymbol = symbol;
+                        allCoin.currencyPrice = (float) price;
+                        allCoin.currencyIconURL = urlString;
+                        allCoin.pc1H = (float) pc1h;
+                        allCoin.pc24H = (float)  pc24h;
+                        allCoin.pc7D = (float) pc7d;
+                        allCoin.currencyCap = (float) marketCap;
+                        allCoin.currencyVol = (float) volume;
+                        
+                        db.allCoinDao().insertCoin(allCoin);
+                    }
+
+                    getAllCoinListFromDB();
+
+
+
+
+
 
 
                     ArrayList<String> favCurrencyList = new ArrayList<>();
@@ -217,11 +248,12 @@ public class HomeFragment extends Fragment {
 
             } catch (JSONException e) {
                 e.printStackTrace();
-                Toast.makeText(getContext(), "Fail to extract json data..", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Fail to extract json data..", Toast.LENGTH_SHORT).show();
             }
         }, error -> {
             loadingPB.setVisibility(View.GONE);
-            Toast.makeText(getContext(), "Fail to get the data..", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "Fail to get the data..", Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "getCurrencyDataNomics: Fail to get the data..");
         });
 
         requestQueue.add(jsonArrayRequest);
@@ -229,65 +261,75 @@ public class HomeFragment extends Fragment {
 
 
 
+    private void getAllCoinListFromDB(){
+        allCoinList = db.allCoinDao().getAllCoinList();
+        currencyRVModalArrayList = new ArrayList<>();
+
+        for (int i = 0; i < allCoinList.size(); i++){
+            String symbol = allCoinList.get(i).currencySymbol;
+            String name = allCoinList.get(i).currencyName;
+            String urlString = allCoinList.get(i).currencyIconURL;
+            float price = allCoinList.get(i).currencyPrice;
+            float pc1h = allCoinList.get(i).pc1H;
+            float pc24h = allCoinList.get(i).pc24H;
+            float pc7d = allCoinList.get(i).pc7D;
+            float curCap = allCoinList.get(i).currencyCap;
+            float curVol = allCoinList.get(i).currencyVol;
+            float curRsi = allCoinList.get(i).currencyRSI;
+
+            currencyRVModalArrayList.add(new CurrencyRVModel(symbol, name, urlString, price, pc1h, pc24h, pc7d, curCap, curVol, curRsi));
+        }
+
+        //Set RV Data
+        currenciesRV.setHasFixedSize(true);
+        currencyRVAdapter = new CurrencyRVAdapter(currencyRVModalArrayList, getContext());
+        currenciesRV.setAdapter(currencyRVAdapter);
+        currenciesRV.setLayoutManager(new LinearLayoutManager(getContext()));
+        currencyRVAdapter.notifyDataSetChanged();
+
+        currencyRVAdapter.setOnItemClickListener(position -> {
+          setOnClick(position);
+        });
+    }
+
+    private void setOnClick(int position){
+        String adapterCurrencySymbol = currencyRVModalArrayList.get(position).getSymbol();
+        String adapterCurrencyName = currencyRVModalArrayList.get(position).getName();
+        String adapterCurrencyURL = currencyRVModalArrayList.get(position).getLogoURL();
+        double adapterCurrencyPrice = currencyRVModalArrayList.get(position).getPrice();
+        double adapterCurrencyPC1H = currencyRVModalArrayList.get(position).getPc1h();
+        double adapterCurrencyPC24H = currencyRVModalArrayList.get(position).getPc24h();
+        double adapterCurrencyPC7D = currencyRVModalArrayList.get(position).getPc7d();
+        double adapterCurrencyCap = currencyRVModalArrayList.get(position).getCap();
+        double adapterCurrencyVol = currencyRVModalArrayList.get(position).getVol();
+        double adapterCurrencyRSI = currencyRVModalArrayList.get(position).getRsi();
 
 
+        favCurrencyList = new ArrayList<>();
 
-
-
-
-
-
-    private void getRsiData(String symbol) {
-
-        ArrayList<String> favCurrencyListnew = new ArrayList<>();
         //Save coin Name to Favorite DB Table
         Favorite favorite = new Favorite();
         List<Favorite> favoriteList = db.favoriteDao().getAllFavorites();
 
         for (int i = 0; i < favoriteList.size(); i++) {
-            favCurrencyListnew.add(favoriteList.get(i).currencySymbol);
+            favCurrencyList.add(favoriteList.get(i).currencySymbol);
         }
-        if (favCurrencyListnew.contains(symbol)) {
-            try {
-                String rsiUrl = "https://api.taapi.io/rsi?secret=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImF6dWJhaXIxMjNAZ21haWwuY29tIiwiaWF0IjoxNjM5MTY5MDg4LCJleHAiOjc5NDYzNjkwODh9.DUufwGln3wS7y_qAyaVIu_CvXVRxLczpJUT96Z6lpEc&exchange=binance&symbol=" + symbol + "/USDT&interval=1h";
-                RequestQueue rsiRequestQueue = Volley.newRequestQueue(getContext());
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, rsiUrl, null, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
+        if (!favCurrencyList.contains(adapterCurrencySymbol)) {
+            favorite.currencyName = adapterCurrencyName;
+            favorite.currencySymbol = adapterCurrencySymbol;
+            favorite.currencyIconURL = adapterCurrencyURL;
+            favorite.currencyPrice = (float) adapterCurrencyPrice;
+            favorite.pc1H = (float) adapterCurrencyPC1H;
+            favorite.pc24H = (float) adapterCurrencyPC24H;
+            favorite.pc7D = (float) adapterCurrencyPC7D;
+            favorite.currencyCap = (float) adapterCurrencyCap;
+            favorite.currencyVol = (float) adapterCurrencyVol;
+            favorite.currencyRSI = (float) adapterCurrencyRSI;
 
-                        Log.i(TAG, "Total Response is: " + response);
-
-
-                        try {
-                            double rsi = response.getDouble("value");
-                            //Update RSI value to database
-                            db.favoriteDao().updateRSIValue(rsi, symbol);
-                                    Log.i(TAG, "getRsiData in try: " + symbol+ rsiValue);
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            double rsi = 1.23;
-                            //finalRSI = rsi;
-                            Log.i(TAG, "RSi Not Found: " + rsi);
-                        }
-
-
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //Toast.makeText(getContext(), "Fail to get RSI data..", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                {
-
-                    rsiRequestQueue.add(jsonObjectRequest);
-                }
-            } catch (Exception e) {
-
-            }
-
+            db.favoriteDao().insertFavorite(favorite);
+            Toast.makeText(getContext(), adapterCurrencySymbol + " is added to Favorite List", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), adapterCurrencySymbol + " is already in Favorite List", Toast.LENGTH_SHORT).show();
         }
 
     }

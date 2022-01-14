@@ -1,5 +1,7 @@
 package com.zottz.cryptocrystal.SetAlertActivity;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -165,9 +167,12 @@ public class ChoseCurrencyFragment extends Fragment {
                     }
 
                 }
+                if (getActivity() != null){
+                    adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, coinArrayList);
+                    listView.setAdapter(adapter);
+                }
 
-                adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, coinArrayList);
-                listView.setAdapter(adapter);
+
 
                 //currencyRVAdapter.notifyDataSetChanged();
 
@@ -179,7 +184,8 @@ public class ChoseCurrencyFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 //loadingPB.setVisibility(View.GONE);
-                Toast.makeText(getContext(), "Fail to get the data..", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), "Fail to get the data..", Toast.LENGTH_SHORT).show();
+                Log.i(TAG, "onErrorResponse: Fail to get the data.");
             }
         });
 
