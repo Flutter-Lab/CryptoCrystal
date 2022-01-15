@@ -42,6 +42,10 @@ public class SelectAlertTypeFragment extends Fragment {
         alertTypeArrayList.add("Price drops to");
         alertTypeArrayList.add("1H change is over (%)");
         alertTypeArrayList.add("1H change is down (%)");
+        alertTypeArrayList.add("RSI rises above 70");
+        alertTypeArrayList.add("RSI drops to 30");
+
+
 
         //Initialize Array adapter for spinning list
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, alertTypeArrayList);
@@ -58,6 +62,7 @@ public class SelectAlertTypeFragment extends Fragment {
 
 //                int code = prefAlertTypeCode.getInt("alertTypeCode", 5);
 //                Log.i("AlertCode: ", code+"");
+
 
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.add_alert_fragment_container,
                         new SetValueFragment()).commit();

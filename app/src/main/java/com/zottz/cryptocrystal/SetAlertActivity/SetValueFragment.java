@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,9 +29,10 @@ public class SetValueFragment extends Fragment {
     MainActivity mainActivity = new MainActivity();
 
     TextInputLayout valueInputLayout;
+    LinearLayout rsiTextLayout;
 
     EditText valueEditText;
-    TextView wrongInputTextView;
+    TextView wrongInputTextView, setValueTextView, rsiSymbolTextView, rsiValueTextView, rsiConditionTV;
     CheckBox loudAlertCheckBox;
     Button setAlertButton2;
 
@@ -50,8 +52,14 @@ public class SetValueFragment extends Fragment {
 
         valueEditText = view.findViewById(R.id.valueEditText);
         wrongInputTextView = view.findViewById(R.id.wrongInputTextView);
+        setValueTextView = view.findViewById(R.id.setValuetextView);
         loudAlertCheckBox = view.findViewById(R.id.loudAlertCheckBox);
         valueInputLayout = view.findViewById(R.id.valueInputLayout);
+        rsiTextLayout = view.findViewById(R.id.rsiTextLayout);
+        rsiSymbolTextView = view.findViewById(R.id.rsiSymbolTextView);
+        rsiValueTextView = view.findViewById(R.id.rsiValueTextView);
+        rsiConditionTV = view.findViewById(R.id.rsiConditionTV);
+
 
         prefAlertTypeCode = getContext().getSharedPreferences("alertTypeCode", Context.MODE_PRIVATE);
         selectedCoinCurrPrice = getContext().getSharedPreferences("selectedCoinCurrPrice", Context.MODE_PRIVATE);
@@ -77,9 +85,21 @@ public class SetValueFragment extends Fragment {
         if (alertCode < 2) {
             valueEditText.setText(String.valueOf(mainActivity.dynDF(currentPrice).format(currentPrice)));
             valueInputLayout.setPrefixText("$");
-        } else {
+        } else if (alertCode < 4){
             valueEditText.setText(String.valueOf(MainActivity.df2.format(pc24h)));
             valueInputLayout.setSuffixText("%");
+        } else {
+            valueEditText.setVisibility(View.GONE);
+            setValueTextView.setVisibility(View.GONE);
+            rsiTextLayout.setVisibility(View.VISIBLE);
+            rsiSymbolTextView.setText(alertSymbol);
+            if (alertCode == 4){
+                rsiConditionTV.setText("RSI rises above");
+                rsiValueTextView.setText("70");
+            } else {
+                rsiConditionTV.setText("RSI drops to");
+                rsiValueTextView.setText("30");
+            }
         }
 
 
@@ -143,6 +163,14 @@ public class SetValueFragment extends Fragment {
                             wrongInputTextView.setText("Value should be smaller than current 24h % Change - " + pc24h + "%");
                             wrongInputTextView.setVisibility(View.VISIBLE);
                         }
+                        break;
+                    case 4:
+                        alertTypeText = "RSI above";
+                        saveAlertAndClose();
+                        break;
+                    case 5:
+                        alertTypeText = "RSI below";
+                        saveAlertAndClose();
                         break;
                 }
 
